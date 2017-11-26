@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
+
     defaultConfig {
         applicationId "com.ankhrom.base.sample"
         minSdkVersion 19
@@ -32,3 +33,30 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile project(path: ':baselib')
 }
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'baselib'
+
+    publishedGroupId = 'com.ankhrom'
+    libraryName = 'baselib'
+    artifact = 'baselib'
+
+    libraryDescription = 'Android Base Binding lib'
+
+    siteUrl = 'https://github.com/RomanBase/baselib'
+    gitUrl = 'https://github.com/RomanBase/baselib.git'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'dcr'
+    developerName = 'Ankhrom'
+    developerEmail = 'decker113@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
