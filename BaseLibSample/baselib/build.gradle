@@ -1,28 +1,12 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: "com.jfrog.bintray"
 
 def libVersionCode = 1
 def libVersionName = '0.0.3'
 
 def sdk_version = 26;
 def appcompat_version = "$sdk_version.1.0"
-
-ext {
-    bintrayRepo = 'baselib' // your repo name
-    bintrayName = 'baselib' // has to be same as your library module name
-    publishedGroupId = 'com.ankhrom' // your module package name
-    libraryName = "baselib"
-    artifact = 'baselib' // has to be same as your library module name
-    libraryDescription = '-'
-    siteUrl = 'https://github.com/ankhrom/baselib'
-    gitUrl = 'https://github.com/ankhrom/baselib.git'
-    libraryVersion = libVersionName
-    developerId = "dcr"
-    developerName = "ankhrom"
-    developerEmail = 'base@ankhrom.com'
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-}
 
 android {
     compileSdkVersion sdk_version
@@ -67,5 +51,88 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
 }
 
-apply from: 'https://raw.githubusercontent.com/numetriclabz/jcenter/master/installv.gradle'
-apply from: 'https://raw.githubusercontent.com/numetriclabz/jcenter/master/bintrayv.gradle'
+def siteUrl = 'https://github.com/Ankhrom/baselib'
+def gitUrl = 'https://github.com/Ankhrom/baselib.git'
+def pkgName = 'com.ankhrom'
+def libName = 'base'
+group = pkgName
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+
+                name "$pkgName.$libName"
+                description = 'base binding lib'
+                url siteUrl
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'decker113'
+                        name 'Roman dcr'
+                        email 'decker113@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        // it is the name that appears in bintray when logged
+        name = "$pkgName:$libName"
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+        version {
+            /*gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+                passphrase = properties.getProperty("bintray.gpg.password")
+                //Optional. The passphrase for GPG signing'
+            }*/
+        }
+    }
+}
